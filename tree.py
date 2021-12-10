@@ -1,9 +1,7 @@
 import pandas as pd
 
 df = pd.read_csv('processed.cleveland.data', header=None)
-print(df.head())
-
-df.columns = ['age', 'sex', 'cp', 'restbp', 'chol', 'fbs', 'restecg', 'thalach', 'exang', 'oldpeak', ' slope', 'ca',
+df.columns = ['age', 'sex', 'cp', 'restbp', 'chol', 'fbs', 'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca',
               'thal', 'hd']
 
 # print(df.head())
@@ -19,4 +17,14 @@ df.columns = ['age', 'sex', 'cp', 'restbp', 'chol', 'fbs', 'restecg', 'thalach',
 #                  (df['thal'] == '?')]))
 
 df_no_missing = df.loc[(df['ca'] != '?') & (df['thal'] != '?')] # importing all rows with no missing values
-print(df_no_missing.head)
+
+
+X = df_no_missing.drop('hd', axis=1).copy()  # data for classification
+y = df_no_missing['hd'].copy()  # data to predict
+
+X_encoded = pd.get_dummies(X, columns=['cp', 'restecg', 'slope', 'thal'])  # one-hot encoding
+
+
+non_zero_index = y > 0  # all non-zero values of y (i.e. has heart disease)
+y[non_zero_index] = 1  # setting all non-zero values equal to 1
+
