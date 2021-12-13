@@ -1,1 +1,7 @@
-# Creating a decision tree from scratch in Python, using libraries such as Pandas and numpy for the purpose of data science practice
+# Creating a decision tree in Python to classify people with heart disease and without heart disease.
+
+Modules Used
+Pandas
+Numpy
+Sk-learn
+Matplotlib
