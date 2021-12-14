@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics import plot_confusion_matrix
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
 df = pd.read_csv('processed.cleveland.data', header=None)
@@ -42,9 +43,13 @@ clf_dt = clf_dt.fit(X_train, y_train)
 # Plotting the tree
 plt.figure(figsize=(15, 7.5))
 plot_tree(clf_dt, filled=True, rounded=True, class_names=['No HD', 'Yes HD'], feature_names=X_encoded.columns)
-plt.show()
+
 
 # Confusion matrix
-plot_confusion_matrix(clf_dt, X_test, y_test, display_labels=['Does not have HD', 'Has HD'])
+# plot_confusion_matrix(clf_dt, X_test, y_test, display_labels=['Does not have HD', 'Has HD'])
+
+# Updated confusion matrix as plot_confusion_matrix has been deprecated
+cm = ConfusionMatrixDisplay.from_estimator(clf_dt, X_test, y_test, display_labels=['Does not have HD', 'Has HD'])
+plt.show()
 
 
