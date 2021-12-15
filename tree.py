@@ -50,6 +50,33 @@ plot_tree(clf_dt, filled=True, rounded=True, class_names=['No HD', 'Yes HD'], fe
 
 # Updated confusion matrix as plot_confusion_matrix has been deprecated
 cm = ConfusionMatrixDisplay.from_estimator(clf_dt, X_test, y_test, display_labels=['Does not have HD', 'Has HD'])
+
+
+# Pruning
+path = clf_dt.cost_complexity_pruning_path(X_train, y_train)
+ccp_alphas = path.ccp_alphas
+ccp_alphas = ccp_alphas[:-1]  # removing maximum value
+
+dta = []  # array to put decision trees into
+
+#  Creating a decision tree for each value of alpha
+for alpha in ccp_alphas:
+    clf_dt = DecisionTreeClassifier(random_state=0, ccp_alpha=alpha)
+    clf_dt.fit(X_train, y_train)
+    dta.append(clf_dt)
+
+#  Graphing the accuracy of the trees for the training and testing dataset as a function of alpha
+train_scores = [clf_dt.score(X_train, y_train) for clf_dt in dta]
+test_scores = [clf_dt.score(X_test, y_test) for clf_dt in dta]
+
+fig, ax = plt.subplots()
+ax.set_xlabel('alpha')
+ax.set_ylabel('accuracy')
+ax.set_title('Accuracy for different values of alpha')
+ax.plot(ccp_alphas, train_scores, marker='o', label='train', drawstyle='steps-post')
+ax.plot(ccp_alphas, test_scores, marker='o', label='test', drawstyle='steps-post')
+ax.legend()
 plt.show()
+
 
 
