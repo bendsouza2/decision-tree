@@ -52,7 +52,7 @@ plot_tree(clf_dt, filled=True, rounded=True, class_names=['No HD', 'Yes HD'], fe
 
 # Updated confusion matrix as plot_confusion_matrix has been deprecated
 cm = ConfusionMatrixDisplay.from_estimator(clf_dt, X_test, y_test, display_labels=['Does not have HD', 'Has HD'])
-
+plt.close()
 
 # Pruning
 path = clf_dt.cost_complexity_pruning_path(X_train, y_train)
@@ -78,14 +78,14 @@ ax.set_title('Accuracy for different values of alpha')
 ax.plot(ccp_alphas, train_scores, marker='o', label='train', drawstyle='steps-post')
 ax.plot(ccp_alphas, test_scores, marker='o', label='test', drawstyle='steps-post')
 ax.legend()
-
+plt.close()
 
 # Cross-validation (5-fold)
 clf_dt = DecisionTreeClassifier(random_state=42, ccp_alpha=0.016)
 scores = cross_val_score(clf_dt, X_train, y_train, cv=5)
 df = pd.DataFrame(data={'tree': range(5), 'accuracy': scores})
 df.plot(x='tree', y='accuracy', marker='o', linestyle='--')
-
+plt.close()
 
 # Optimal alpha with cross validation
 alpha_loop_vals = []  # array to store results of each fold
@@ -97,12 +97,29 @@ for alpha in ccp_alphas:
 # Plot the graph
 alpha_results = pd.DataFrame(alpha_loop_vals, columns=['alpha', 'mean_accuracy', 'std'])
 alpha_results.plot(x='alpha', y='mean_accuracy', yerr='std', marker='o', linestyle='--')
-plt.show()
+plt.close()
 
 # Finding optimal value for alpha
 ideal_ccp_alpha = alpha_results[(alpha_results['alpha'] > 0.014)
               &
               (alpha_results['alpha'] < 0.015)]['alpha']
+
 ideal_ccp_alpha = float(ideal_ccp_alpha)  # converting ideal_ccp_alpha from series to float
 
+# Pruned tree
+clf_dt_pruned = DecisionTreeClassifier(random_state=42, ccp_alpha=ideal_ccp_alpha)
+clf_dt_pruned = clf_dt_pruned.fit(X_train, y_train)
 
+# Confusion matrix for pruned tree
+cmp = ConfusionMatrixDisplay.from_estimator(clf_dt_pruned, X_test, y_test, display_labels=['Does not have HD', 'Has HD'])
+plt.close()
+
+# Draw pruned tree
+plt.figure(figsize=(10, 4))
+plot_tree(clf_dt_pruned,
+          filled=True,
+          rounded=True,
+          class_names=['No HD', 'Yes HD'],
+          feature_names=X_encoded.columns)
+
+plt.show()
